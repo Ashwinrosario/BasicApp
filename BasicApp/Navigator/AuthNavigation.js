@@ -1,14 +1,14 @@
-import * as React from 'react';
+import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-
 import Login from '../Screens/Login';
 import Signup from '../Screens/SignUp';
-import {useLogin} from '../Context/LoginProvider';
-import MainNavigator from './MainNavigation';
 
 const Stack = createNativeStackNavigator();
 
-const AuthNavigator = () => {
+const AuthNavigator = ({setHide}) => {
+  useEffect(() => {
+    setHide(true);
+  }, [setHide]);
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Login" component={Login} />
@@ -16,13 +16,4 @@ const AuthNavigator = () => {
     </Stack.Navigator>
   );
 };
-
-const RootNavigator = () => {
-  const {isLoggedIn} = useLogin();
-  if (isLoggedIn) {
-    return <MainNavigator />;
-  }
-  return <AuthNavigator />;
-};
-
-export default RootNavigator;
+export default AuthNavigator;
