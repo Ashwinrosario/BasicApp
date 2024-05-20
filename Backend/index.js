@@ -9,9 +9,7 @@ app.use(
     origin: "*",
   })
 );
-
 require("./DB/conn");
-
 const Routes = require("./Routes/routes");
 app.use(Routes);
 
