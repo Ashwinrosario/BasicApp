@@ -1,15 +1,35 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, Alert} from 'react-native';
 import {TextInput, Button} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useLogin} from '../Context/LoginProvider';
+import axios from 'axios';
 
-function Signup({navigation}) {
+const Signup = ({navigation}) => {
+  const {setIsLoggedIn} = useLogin();
   const [name, setName] = React.useState('');
   const [password, setPassword] = React.useState('');
+
   const handleSignUp = async () => {
+    if (name === '' || password === '') {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
     try {
-      await AsyncStorage.setItem('name', name);
-      navigation.navigate('Home', {name});
+      await axios
+        .post('http://192.168.29.97:8000/signup', {
+          name: name,
+          password: password,
+        })
+        .then(async res => {
+          if (res.data.status == 'Success') {
+            Alert.alert('Success', 'Sign up Successfull');
+            await AsyncStorage.setItem('name', name);
+            setIsLoggedIn(true);
+          } else {
+            Alert.alert('Error', 'Please retry');
+          }
+        });
     } catch (error) {
       console.error(error);
     }
@@ -32,21 +52,20 @@ function Signup({navigation}) {
           onChangeText={password => setPassword(password)}
         />
       </View>
-      {name && password && (
-        <View style={styles.ButtonContainer}>
-          <Button
-            title="Signup"
-            onPress={handleSignUp}
-            mode="contained"
-            buttonColor="blue"
-            style={{margin: 10}}>
-            <Text style={{padding: 20, margin: 10}}>Signup</Text>
-          </Button>
-        </View>
-      )}
+
+      <View style={styles.ButtonContainer}>
+        <Button
+          title="Signup"
+          onPress={handleSignUp}
+          mode="contained"
+          buttonColor="blue"
+          style={{margin: 10}}>
+          <Text style={{padding: 20, margin: 10}}>Signup</Text>
+        </Button>
+      </View>
     </View>
   );
-}
+};
 
 export default Signup;
 

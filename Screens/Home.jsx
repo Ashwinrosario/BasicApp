@@ -1,9 +1,10 @@
 import React from 'react';
-import {StyleSheet, Text, Button, View} from 'react-native';
+import {StyleSheet, Text, Button, View, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useLogin} from '../Context/LoginProvider';
 
 const Home = ({navigation, route}) => {
-  console.log('home page');
+  const {setIsLoggedIn} = useLogin();
   const [name, setName] = React.useState('');
   const [loading, setLoading] = React.useState(true);
 
@@ -26,8 +27,9 @@ const Home = ({navigation, route}) => {
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('name');
+      setIsLoggedIn(false);
       setName('');
-      alert('Successfully Logged Out');
+      Alert.alert('Successfully Logged Out');
     } catch (error) {
       console.error('Failed to remove name from AsyncStorage', error);
     }

@@ -1,23 +1,42 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, Alert} from 'react-native';
 import {TextInput, Button} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useLogin} from '../Context/LoginProvider';
+import axios from 'axios';
 
-function Login({navigation}) {
+const Login = ({navigation}) => {
+  const {setIsLoggedIn} = useLogin();
   const [name, setName] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const getname = async () => {
-    console.log('from the login ',await AsyncStorage.getItem('name'));
-  };
-  getname();
+
   const handleLogin = async () => {
+    if (name === '' || password === '') {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
     try {
-      await AsyncStorage.setItem('name', name);
-      navigation.navigate('Home', {name});
+      await axios
+        .post('http://192.168.29.97:8000/login', {
+          name: name,
+          password: password,
+        })
+        .then(async res => {
+          if (res.data.message === 'true') {
+            await AsyncStorage.setItem('name', name);
+            setIsLoggedIn(true);
+          } else if (res.data.message === 'User does not exist') {
+            Alert.alert(
+              'Error',
+              "Couldn't Log you in:( \n Please try Register first",
+            );
+          }
+        });
     } catch (error) {
       console.error(error);
     }
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Welcome</Text>
@@ -26,48 +45,40 @@ function Login({navigation}) {
           label="Name"
           mode="outlined"
           value={name}
-          onChangeText={name => setName(name)}
+          onChangeText={setName}
         />
         <TextInput
           label="Password"
           mode="outlined"
           value={password}
-          secureTextEntry={true}
-          onChangeText={password => setPassword(password)}
+          secureTextEntry
+          onChangeText={setPassword}
         />
       </View>
-      {name && password && (
-        <View style={styles.ButtonContainer}>
+      <View style={styles.buttonRow}>
+        <View style={styles.buttonWrapper}>
           <Button
-            title="Login"
-            onPress={handleLogin}
             mode="contained"
-            buttonColor="blue"
-            style={{margin: 10}}>
-            <Text style={{padding: 20, margin: 10}}>Login</Text>
+            onPress={handleLogin}
+            style={styles.button}
+            buttonColor="blue">
+            <Text style={styles.buttonText}>Login</Text>
           </Button>
         </View>
-      )}
-      {(!name || !password) && (
-        <>
-          <View style={styles.ButtonContainer}>
-            <Button
-              title="Signup"
-              onPress={() => navigation.navigate('Signup')}
-              mode="contained"
-              buttonColor="blue"
-              style={{margin: 10}}>
-              <Text style={{padding: 20, margin: 10}}>Signup</Text>
-            </Button>
-          </View>
-          <View>
-            <Text>Don't have an Account</Text>
-          </View>
-        </>
-      )}
+        <View style={styles.buttonWrapper}>
+          <Button
+            mode="contained"
+            onPress={() => navigation.navigate('Signup')}
+            style={styles.button}
+            buttonColor="blue">
+            <Text style={styles.buttonText}>Signup</Text>
+          </Button>
+          <Text style={styles.signupText}>Don't have an Account</Text>
+        </View>
+      </View>
     </View>
   );
-}
+};
 
 export default Login;
 
@@ -78,10 +89,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ButtonContainer: {
-    display: 'flex',
+  buttonRow: {
     flexDirection: 'row',
-    alignContent: 'center',
+    justifyContent: 'space-between',
+    width: '80%',
+    marginTop: 20,
+  },
+  buttonWrapper: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  button: {
+    margin: 10,
+  },
+  buttonText: {
+    padding: 10,
+    margin: 5,
   },
   inputContainer: {
     width: '80%',
@@ -91,6 +114,10 @@ const styles = StyleSheet.create({
     color: 'rgb(59,108,300)',
     fontSize: 52,
     fontWeight: '400',
+    textAlign: 'center',
+  },
+  signupText: {
+    marginTop: 10,
     textAlign: 'center',
   },
 });

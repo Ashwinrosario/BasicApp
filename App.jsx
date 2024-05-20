@@ -1,39 +1,23 @@
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import AppNavigator from './navigation';
+import RootNavigator from './Navigator/RootNavigation';
 import SplashScreen from 'react-native-splash-screen';
 import {Platform} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoginProvider from './context/LoginProvider';
 
 const App = () => {
-  const [initialRoute, setInitialRoute] = React.useState('');
-
   React.useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const name = await AsyncStorage.getItem('name');
-        console.log('in the app.js', name);
-        if (name) {
-          setInitialRoute('Home');
-        } else {
-          setInitialRoute('Login');
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        if (Platform.OS === 'android') {
-          SplashScreen.hide();
-        }
-      }
-    };
-
-    checkUser();
+    if (Platform.OS === 'android') {
+      SplashScreen.hide();
+    }
   }, []);
 
   return (
-    <NavigationContainer>
-      <AppNavigator initialRoute={initialRoute} />
-    </NavigationContainer>
+    <LoginProvider>
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    </LoginProvider>
   );
 };
 
