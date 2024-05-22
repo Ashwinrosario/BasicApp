@@ -11,6 +11,7 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
+import io.invertase.firebase.app.ReactNativeFirebaseAppPackage;
 
 class MainApplication : Application(), ReactApplication {
 

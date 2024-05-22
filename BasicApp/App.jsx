@@ -3,7 +3,6 @@ import {NavigationContainer} from '@react-navigation/native';
 import AppNavigator from './Navigator/AppNavigator';
 import LoginProvider from './Context/LoginProvider';
 // import messaging from '@react-native-firebase/messaging';
-// import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 const App = () => {
   // async function requestUserPermission() {
